@@ -1,0 +1,77 @@
+﻿@model CRM.Models.Order
+
+<h2>Create New Order</h2>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="OrderNumber" class="control-label"></label>
+        <input asp-for="OrderNumber" class="form-control" />
+        <span asp-validation-for="OrderNumber" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Date" class="control-label"></label>
+        <input asp-for="Date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+    @Html.LabelFor(o => o.Client)
+    @Html.DropDownListFor(o => o.ClientId, (SelectList)ViewBag.ClientList, "-- Select Client --", new { @class = "form-control" })
+    <div class="form-group">
+        <label asp-for="OrderItems" class="control-label"></label>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="order-items">
+                @for (int i = 0; i < Model.OrderItems.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <select asp-for="OrderItems[i].ProductId" class="form-control" asp-items="@ViewBag.ProductList">
+                                <option value="">-- Select Product --</option>
+                            </select>
+                        </td>
+                        <td><input asp-for="OrderItems[i].Quantity" class="form-control" /></td>
+                        <td><input asp-for="OrderItems[i].Price" class="form-control" /></td>
+                        <td>
+                            <a href="#" class="btn btn-danger remove-row">Remove</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <a href="#" class="btn btn-success add-row">Add Product</a>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $(".add-row").click(function () {
+                var $table = $(".table tbody");
+                var $tr = $table.find("tr:last");
+                var $clone = $tr.clone();
+                var index = $table.find("tr").length;
+                $clone.find(":input").each(function () {
+                    var name = $(this).attr("name").replace(/\[\d\]/, "[" + index + "]");
+                    $(this).attr("name", name);
+                    $(this).val("");
+                });
+                $table.append($clone);
+                return false;
+            });
+
+            $(".table").on("click", ".remove-row", function () {
+                $(this).closest("tr").remove();
+                return false;
+            });
+        });
+    </script>
+}
